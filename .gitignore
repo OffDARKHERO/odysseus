@@ -89,3 +89,9 @@ docs/windows-port/
 compound.config.json
 *.error.log
 _scratch/
+
+# --- Capa de escritorio Windows (archivos locales/generados, no versionar) ---
+Odysseus-silent.vbs
+Odysseus.bat
+odysseus.ico
+odysseus-icon-preview.png

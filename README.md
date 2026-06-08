@@ -261,6 +261,12 @@ do not run on macOS. MLX-only models are not served by Odysseus.
 
 ### Native Windows
 
+> 🖥️ **¿Quieres icono de escritorio, memoria/RAG listos sin Docker, embeddings
+> multilingües y que abra en su propia ventana?** Hay un **instalador de
+> escritorio mejorado** para Windows nativo (capa de comodidad añadida; no
+> modifica el core de Odysseus): ver **[docs/windows-desktop-setup.md](docs/windows-desktop-setup.md)**.
+> Resumen: `powershell -ExecutionPolicy Bypass -File .\install-windows-desktop.ps1`
+
 **One-command launcher** (creates the venv, installs deps, runs setup, starts the
 server; safe to re-run):
 
