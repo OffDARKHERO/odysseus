@@ -6,6 +6,11 @@ working**, **multilingual embeddings**, **agent web browsing**, and a **desktop
 icon** that opens Odysseus in its **own window** (PWA app mode), with no black
 console and waiting until the server is ready before opening.
 
+![Odysseus running on Windows as a standalone app window, with the desktop icon and the system tray icon](windows-desktop-example.png)
+
+*Odysseus running in its own window (PWA app mode) via the desktop icon, with the
+"Odysseus (running)" system tray icon and a local model served by LM Studio.*
+
 > Note: this does **not** modify Odysseus' internal behavior. These are scripts
 > and files *added around* the app (installer, launcher, icon). The original
 > Odysseus code is untouched, so you can keep updating with `git pull` normally.
