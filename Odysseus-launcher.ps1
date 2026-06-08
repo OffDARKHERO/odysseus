@@ -1,7 +1,7 @@
-# Odysseus - lanzador grafico para Windows
-# Muestra un splash mientras arranca ChromaDB + servidor, espera a que el
-# servidor responda y SOLO entonces abre Odysseus en su propia ventana. Deja un
-# icono en la bandeja del sistema para abrir/detener (la consola queda oculta).
+# Odysseus - graphical launcher for Windows
+# Shows a splash while ChromaDB + the server start, waits until the server
+# responds, and only then opens Odysseus in its own window. Leaves a system
+# tray icon to open/stop it (the console stays hidden).
 
 $ErrorActionPreference = 'SilentlyContinue'
 Add-Type -AssemblyName System.Windows.Forms
@@ -43,7 +43,7 @@ $title.BackColor = 'Transparent'
 $form.Controls.Add($title)
 
 $status = New-Object System.Windows.Forms.Label
-$status.Text = 'Iniciando...'
+$status.Text = 'Starting...'
 $status.ForeColor = $muted
 $status.Font = New-Object System.Drawing.Font('Segoe UI',10)
 $status.TextAlign = 'MiddleCenter'
@@ -61,9 +61,8 @@ function Set-Status($t) {
     [System.Windows.Forms.Application]::DoEvents()
 }
 
-# Abrir Odysseus en una VENTANA INDEPENDIENTE (modo app PWA, sin pestanas ni
-# barra de direcciones). Detecta Chrome o Edge; si no hay, usa el navegador por
-# defecto como respaldo.
+# Open Odysseus in a STANDALONE WINDOW (PWA app mode, no tabs or address bar).
+# Detects Chrome or Edge; falls back to the default browser if neither exists.
 $script:appUrl = 'http://127.0.0.1:7000'
 function Open-OdysseusWindow {
     $candidates = @(
@@ -84,13 +83,13 @@ function Open-OdysseusWindow {
 $script:odyPid    = $null
 $script:chromaPid = $null
 
-# ---------- Arrancar servicios (solo si no estan ya en marcha) ----------
+# ---------- Start services (only if not already running) ----------
 $already = Get-NetTCPConnection -LocalPort 7000 -State Listen -ErrorAction SilentlyContinue
 if ($already) {
-    Set-Status 'Odysseus ya estaba abierto'
+    Set-Status 'Odysseus already running'
 } else {
     # ChromaDB
-    Set-Status 'Iniciando memoria (ChromaDB)...'
+    Set-Status 'Starting memory (ChromaDB)...'
     $chromaUp  = Get-NetTCPConnection -LocalPort 8100 -State Listen -ErrorAction SilentlyContinue
     $chromaExe = Join-Path $root 'venv-chroma\Scripts\chroma.exe'
     if (-not $chromaUp -and (Test-Path $chromaExe)) {
@@ -100,15 +99,15 @@ if ($already) {
         Start-Sleep -Seconds 3
     }
 
-    # Servidor Odysseus (oculto)
-    Set-Status 'Arrancando servidor...'
+    # Odysseus server (hidden)
+    Set-Status 'Starting server...'
     $venvPy = Join-Path $root 'venv\Scripts\python.exe'
     $ody = Start-Process -WindowStyle Hidden -PassThru -FilePath $venvPy `
         -ArgumentList @('-m','uvicorn','app:app','--host','127.0.0.1','--port','7000')
     $script:odyPid = $ody.Id
 
-    # Esperar readiness
-    Set-Status 'Esperando al servidor...'
+    # Wait for readiness
+    Set-Status 'Waiting for the server...'
     $ready = $false
     for ($i = 0; $i -lt 90; $i++) {
         Start-Sleep -Milliseconds 700
@@ -116,33 +115,33 @@ if ($already) {
             Invoke-WebRequest -Uri 'http://127.0.0.1:7000/' -UseBasicParsing -TimeoutSec 2 -MaximumRedirection 0 -ErrorAction Stop | Out-Null
             $ready = $true; break
         } catch {
-            if ($_.Exception.Response) { $ready = $true; break }  # 302 login = listo
+            if ($_.Exception.Response) { $ready = $true; break }  # 302 login = ready
         }
-        if ($i -eq 8)  { Set-Status 'Cargando modulos (memoria, RAG, MCP)...' }
-        if ($i -eq 25) { Set-Status 'Casi listo...' }
+        if ($i -eq 8)  { Set-Status 'Loading modules (memory, RAG, MCP)...' }
+        if ($i -eq 25) { Set-Status 'Almost ready...' }
         [System.Windows.Forms.Application]::DoEvents()
     }
-    if (-not $ready) { Set-Status 'El servidor tardo demasiado. Abriendo de todos modos...'; Start-Sleep -Seconds 1 }
+    if (-not $ready) { Set-Status 'Server took too long. Opening anyway...'; Start-Sleep -Seconds 1 }
 }
 
-# ---------- Abrir ventana ----------
-Set-Status 'Abriendo Odysseus...'
+# ---------- Open window ----------
+Set-Status 'Opening Odysseus...'
 Open-OdysseusWindow
 Start-Sleep -Milliseconds 700
 $form.Hide()
 
-# ---------- Icono en bandeja del sistema (SIEMPRE) ----------
+# ---------- System tray icon (ALWAYS) ----------
 $notify = New-Object System.Windows.Forms.NotifyIcon
 $icoPath = Join-Path $root 'odysseus.ico'
 if (Test-Path $icoPath) { $notify.Icon = New-Object System.Drawing.Icon($icoPath) }
 else { $notify.Icon = [System.Drawing.SystemIcons]::Application }
-$notify.Text = 'Odysseus (en ejecucion)'
+$notify.Text = 'Odysseus (running)'
 $notify.Visible = $true
-$notify.ShowBalloonTip(2500,'Odysseus','Servidor en marcha en http://127.0.0.1:7000',[System.Windows.Forms.ToolTipIcon]::Info)
+$notify.ShowBalloonTip(2500,'Odysseus','Server running at http://127.0.0.1:7000',[System.Windows.Forms.ToolTipIcon]::Info)
 
 $menu = New-Object System.Windows.Forms.ContextMenuStrip
-$miOpen = $menu.Items.Add('Abrir Odysseus')
-$miStop = $menu.Items.Add('Detener Odysseus')
+$miOpen = $menu.Items.Add('Open Odysseus')
+$miStop = $menu.Items.Add('Stop Odysseus')
 $notify.ContextMenuStrip = $menu
 
 $openAction = { Open-OdysseusWindow }
@@ -153,7 +152,7 @@ $stopAction = {
     foreach ($procId in @($script:odyPid, $script:chromaPid)) {
         if ($procId) { Stop-Process -Id $procId -Force -ErrorAction SilentlyContinue }
     }
-    # respaldo: liberar puertos aunque los PID no se conozcan (instancia previa)
+    # fallback: free the ports even if PIDs are unknown (previous instance)
     foreach ($port in 7000,8100) {
         $c = Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue
         if ($c) { $c | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue } }

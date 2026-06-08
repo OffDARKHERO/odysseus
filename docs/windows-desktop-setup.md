@@ -1,61 +1,60 @@
-# Odysseus en Windows — Instalación de escritorio (con icono y ventana propia)
+# Odysseus on Windows — Desktop install (icon + standalone window)
 
-Esta guía describe una **capa de comodidad para Windows nativo** construida sobre
-Odysseus: un instalador de un comando que deja la app lista con **memoria y RAG
-funcionando**, **embeddings multilingües**, **navegación web del agente**, y un
-**icono de escritorio** que abre Odysseus en su **propia ventana** (modo app PWA),
-sin consola negra y esperando a que el servidor esté listo antes de abrir.
+This guide describes a **convenience layer for native Windows** built on top of
+Odysseus: a one-command installer that leaves the app ready with **memory and RAG
+working**, **multilingual embeddings**, **agent web browsing**, and a **desktop
+icon** that opens Odysseus in its **own window** (PWA app mode), with no black
+console and waiting until the server is ready before opening.
 
-> ℹ️ **Esto NO modifica el comportamiento interno de Odysseus.** Son scripts y
-> archivos *añadidos* alrededor de la app (instalador, lanzador, icono). El
-> código original de Odysseus queda intacto, así que puedes seguir actualizando
-> con `git pull` con normalidad.
+> Note: this does **not** modify Odysseus' internal behavior. These are scripts
+> and files *added around* the app (installer, launcher, icon). The original
+> Odysseus code is untouched, so you can keep updating with `git pull` normally.
 
 ---
 
-## ¿Qué mejora respecto a la instalación base?
+## What it improves over the base install
 
-La instalación nativa por defecto (`launch-windows.ps1`) arranca el servidor en
-una consola y abre el navegador. Esta capa añade, encima de eso:
+The default native install (`launch-windows.ps1`) starts the server in a console
+and opens the browser. This layer adds, on top of that:
 
-| Mejora | Qué resuelve |
+| Improvement | What it solves |
 |---|---|
-| **Servidor ChromaDB local automático** | Sin Docker, la memoria vectorial y el RAG quedaban en estado `DEGRADED`. Ahora arrancan solos. |
-| **Modelo de embeddings multilingüe** | El modelo por defecto (`all-MiniLM-L6-v2`) es flojo en español. Se usa `paraphrase-multilingual-mpnet-base-v2`. |
-| **Browser MCP preinstalado** | Habilita la navegación web / capturas del agente (Playwright). |
-| **Icono de escritorio (el barquito)** | Acceso directo con el logo de Odysseus, generado localmente. |
-| **Lanzador con splash** | Pantalla de carga con estado en vivo, **sin consola negra**. |
-| **Espera de readiness** | El navegador abre **solo cuando el servidor responde** (adiós al "no se puede conectar"). |
-| **Ventana independiente (modo app)** | Odysseus abre en su propia ventana, sin pestañas ni barra de direcciones. |
-| **Icono en la bandeja del sistema** | Menú para *Abrir* o *Detener* Odysseus (incluido ChromaDB). |
+| **Automatic local ChromaDB server** | Without Docker, vector memory and RAG stayed `DEGRADED`. Now they start on their own. |
+| **Multilingual embedding model** | The default model (`all-MiniLM-L6-v2`) is weak on non-English text. Uses `paraphrase-multilingual-mpnet-base-v2`. |
+| **Preinstalled Browser MCP** | Enables the agent's web browsing / screenshots (Playwright). |
+| **Desktop icon (the boat)** | Shortcut with the Odysseus logo, generated locally. |
+| **Launcher with splash** | Loading screen with live status, **no black console**. |
+| **Readiness wait** | The browser opens **only once the server responds** (no more "can't connect"). |
+| **Standalone window (app mode)** | Odysseus opens in its own window, no tabs or address bar. |
+| **System tray icon** | Menu to *Open* or *Stop* Odysseus (ChromaDB included). |
 
 ---
 
-## ¿De dónde viene cada pieza? (créditos)
+## Where each piece comes from (credits)
 
-- **Odysseus** — la app base. Proyecto original: <https://github.com/pewdiepie-archdaemon/odysseus> (licencia MIT).
-- **ChromaDB** — base de datos vectorial que Odysseus ya usa para memoria/RAG; aquí solo se levanta como servicio local. <https://www.trychroma.com>
-- **FastEmbed (ONNX)** + modelo `paraphrase-multilingual-mpnet-base-v2` (sentence-transformers) — embeddings locales.
-- **Playwright MCP** (`@playwright/mcp`) — servidor MCP de navegador que Odysseus reconoce de fábrica.
-- **El instalador, el lanzador, el icono y esta guía** — añadidos de esta capa de comodidad para Windows (no forman parte del Odysseus original).
+- **Odysseus** — the base app. Original project: <https://github.com/pewdiepie-archdaemon/odysseus> (MIT license).
+- **ChromaDB** — the vector database Odysseus already uses for memory/RAG; here it is only run as a local service. <https://www.trychroma.com>
+- **FastEmbed (ONNX)** + the `paraphrase-multilingual-mpnet-base-v2` model (sentence-transformers) — local embeddings.
+- **Playwright MCP** (`@playwright/mcp`) — browser MCP server that Odysseus recognizes out of the box.
+- **The installer, launcher, icon and this guide** — additions of this Windows convenience layer (not part of upstream Odysseus).
 
-El icono reproduce el **logo de marca de Odysseus** (el velero salmón `#e06c75`
-que la app usa como favicon), dibujado a un `.ico` para el escritorio.
+The icon reproduces the **Odysseus brand logo** (the salmon sailboat `#e06c75`
+the app uses as its favicon), rendered to an `.ico` for the desktop.
 
 ---
 
-## Requisitos
+## Requirements
 
 - **Windows 10/11**
 - **Python 3.11+** — <https://www.python.org/downloads/>
-- **LM Studio** (u Ollama, u otro proveedor) con un modelo cargado, para chatear — <https://lmstudio.ai>
-- **Node.js** (opcional) — solo si quieres la navegación web del agente (Browser MCP). <https://nodejs.org>
+- **LM Studio** (or Ollama, or another provider) with a model loaded, to chat — <https://lmstudio.ai>
+- **Node.js** (optional) — only if you want agent web browsing (Browser MCP). <https://nodejs.org>
 
 ---
 
-## Instalación (un comando)
+## Install (one command)
 
-Abre **PowerShell** en la carpeta del repo y ejecuta:
+Open **PowerShell** in the repo folder and run:
 
 ```powershell
 git clone https://github.com/pewdiepie-archdaemon/odysseus.git
@@ -63,76 +62,76 @@ cd odysseus
 powershell -ExecutionPolicy Bypass -File .\install-windows-desktop.ps1
 ```
 
-El instalador (seguro de re-ejecutar) hace:
+The installer (safe to re-run) does:
 
-1. Busca Python 3.11+.
-2. Crea `venv`, instala dependencias y corre `setup.py` (te pedirá un usuario y contraseña de admin).
-3. Instala el servidor **ChromaDB** en un venv aparte (`venv-chroma`).
-4. Configura y descarga el **modelo de embeddings multilingüe**.
-5. Instala el **Browser MCP** si detecta Node/npx.
-6. Genera el **icono** del barquito.
-7. Crea el **lanzador silencioso** y el **acceso directo en tu escritorio**.
+1. Finds Python 3.11+.
+2. Creates `venv`, installs dependencies and runs `setup.py` (prompts for an admin username and password).
+3. Installs the **ChromaDB** server in a separate venv (`venv-chroma`).
+4. Configures and downloads the **multilingual embedding model**.
+5. Installs the **Browser MCP** if Node/npx is detected.
+6. Generates the boat **icon**.
+7. Creates the **silent launcher** and the **desktop shortcut**.
 
-Al terminar: **doble clic en "Odysseus"** del escritorio.
+When done: **double-click "Odysseus"** on the desktop.
 
-### Opciones del instalador
+### Installer options
 ```powershell
-# Sin descargar el modelo de embeddings (se descargará al primer arranque):
+# Skip downloading the embedding model (it will download on first start):
 .\install-windows-desktop.ps1 -SkipEmbedDownload
 
-# Sin instalar el Browser MCP:
+# Skip installing the Browser MCP:
 .\install-windows-desktop.ps1 -SkipBrowserMcp
 ```
 
 ---
 
-## Cómo funciona el lanzador
+## How the launcher works
 
-Al hacer doble clic en el icono:
+When you double-click the icon:
 
-1. Aparece un **splash** con el barquito y el estado: *Iniciando memoria → Arrancando servidor → Cargando módulos → Listo*.
-2. Arranca **ChromaDB** (si no estaba) y el **servidor de Odysseus**, ambos ocultos.
-3. **Sondea** `http://127.0.0.1:7000` hasta que responde.
-4. Abre Odysseus en una **ventana independiente** (Chrome o Edge en modo `--app`; si no hay ninguno, usa el navegador por defecto).
-5. Deja un **icono del barquito en la bandeja del sistema** (junto al reloj):
-   - **Abrir Odysseus** (o doble clic en el icono)
-   - **Detener Odysseus** — apaga el servidor y ChromaDB de forma limpia.
+1. A **splash** appears with the boat and live status: *Starting memory -> Starting server -> Loading modules -> Ready*.
+2. **ChromaDB** (if not already up) and the **Odysseus server** start, both hidden.
+3. It **polls** `http://127.0.0.1:7000` until it responds.
+4. It opens Odysseus in a **standalone window** (Chrome or Edge in `--app` mode; if neither is present, it uses the default browser).
+5. It leaves a **boat icon in the system tray** (next to the clock):
+   - **Open Odysseus** (or double-click the icon)
+   - **Stop Odysseus** — shuts down the server and ChromaDB cleanly.
 
-> Como la consola queda oculta, **la forma correcta de apagar Odysseus es**
-> *Detener Odysseus* desde el icono de la bandeja.
+> Since the console is hidden, the correct way to shut Odysseus down is
+> *Stop Odysseus* from the tray icon.
 
-### Archivos que componen la capa
-- `install-windows-desktop.ps1` — instalador portable (usa su propia ruta, sin rutas fijas).
-- `scripts/make_icon.py` — dibuja `odysseus.ico` y el PNG del splash.
-- `Odysseus-launcher.ps1` — splash + readiness + ventana app + bandeja.
-- `Odysseus-silent.vbs` — lanza el script anterior sin parpadeo de consola (lo genera el instalador con tu ruta).
-
----
-
-## Uso diario
-
-1. Abre **LM Studio** con tu modelo cargado (contexto ≥ 16K recomendado; modelos de razonamiento como Qwen3 necesitan suficientes *max tokens* para responder).
-2. En Odysseus, añade el endpoint local: **Settings → Add Models → LOCAL →** `http://127.0.0.1:1234/v1` (o el comando `/setup local http://127.0.0.1:1234/v1`).
-3. **Doble clic** en el icono del escritorio cuando quieras abrirlo.
+### Files that make up the layer
+- `install-windows-desktop.ps1` — portable installer (uses its own path, no hard-coded paths).
+- `scripts/make_icon.py` — draws `odysseus.ico` and the splash PNG.
+- `Odysseus-launcher.ps1` — splash + readiness + app window + tray.
+- `Odysseus-silent.vbs` — runs the launcher with no console flash (generated by the installer with your path).
 
 ---
 
-## Desinstalar / revertir
+## Daily use
 
-- **Quitar el icono:** borra `Odysseus.lnk` de tu escritorio.
-- **Quitar la memoria local:** borra la carpeta `venv-chroma/` (ChromaDB dejará de arrancar; la app vuelve a `DEGRADED` pero funciona).
-- **Volver al arranque básico:** usa `launch-windows.ps1` del repo original en lugar del icono.
-- Tus datos viven en `data/` (chats, memorias, config) y no se tocan al revertir.
+1. Open **LM Studio** with your model loaded (context >= 16K recommended; reasoning models like Qwen3 need enough *max tokens* to actually answer).
+2. In Odysseus, add the local endpoint: **Settings -> Add Models -> LOCAL ->** `http://127.0.0.1:1234/v1` (or the `/setup local http://127.0.0.1:1234/v1` command).
+3. **Double-click** the desktop icon whenever you want to open it.
 
 ---
 
-## Solución de problemas
+## Uninstall / revert
 
-| Síntoma | Causa / arreglo |
+- **Remove the icon:** delete `Odysseus.lnk` from your desktop.
+- **Remove local memory:** delete the `venv-chroma/` folder (ChromaDB stops starting; the app falls back to `DEGRADED` but still works).
+- **Back to the basic launcher:** use `launch-windows.ps1` from the original repo instead of the icon.
+- Your data lives in `data/` (chats, memories, config) and is not touched when reverting.
+
+---
+
+## Troubleshooting
+
+| Symptom | Cause / fix |
 |---|---|
-| El icono abre y "no se puede conectar" un instante | El servidor aún arranca; el splash espera, recarga si hace falta. |
-| `error 10048 / bind on 7000` | Ya hay una instancia abierta. Usa *Detener Odysseus* en la bandeja, o reinicia. |
-| Memoria/RAG en `DEGRADED` | ChromaDB no arrancó: confirma que existe `venv-chroma/` y vuelve a ejecutar el instalador. |
-| Respuestas vacías del chat | El modelo (p. ej. Qwen3) gastó los tokens "razonando". Sube *Max Tokens* y el contexto en LM Studio. |
-| El agente no usa el correo | Cambia a **modo Agente** (en Chat normal el modelo no tiene herramientas). |
-| El correo de Outlook/Microsoft 365 falla | Microsoft requiere OAuth; aún no soportado. Usa Gmail/IMAP con contraseña de aplicación. |
+| Icon opens and shows "can't connect" for an instant | The server is still starting; the splash waits, reload if needed. |
+| `error 10048 / bind on 7000` | An instance is already open. Use *Stop Odysseus* in the tray, or restart. |
+| Memory/RAG stuck in `DEGRADED` | ChromaDB did not start: confirm `venv-chroma/` exists and re-run the installer. |
+| Empty chat replies | The model (e.g. Qwen3) spent its tokens "thinking". Raise *Max Tokens* and the context in LM Studio. |
+| The agent can't use email | Switch to **Agent mode** (in plain Chat the model has no tools). |
+| Outlook / Microsoft 365 email fails | Microsoft requires OAuth; not supported yet. Use Gmail/IMAP with an app password. |

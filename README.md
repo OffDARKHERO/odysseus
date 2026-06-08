@@ -261,24 +261,22 @@ do not run on macOS. MLX-only models are not served by Odysseus.
 
 ### Native Windows
 
-> ### 🖥️ Añadidos de este fork (experiencia de escritorio en Windows)
+> **Desktop experience add-on (this fork).** A **convenience layer for native
+> Windows** on top of upstream Odysseus (**does not modify the core**; keep
+> updating with `git pull`). It adds:
 >
-> Este fork incluye una **capa de comodidad para Windows nativo** sobre el
-> Odysseus original (**no modifica el core**; puedes seguir actualizando con
-> `git pull`). Lo que añade:
+> - **One-command installer** (`install-windows-desktop.ps1`): sets up the venv,
+>   dependencies, admin account, **local ChromaDB** (memory + RAG without
+>   Docker), **multilingual embeddings**, **Browser MCP** and the desktop
+>   shortcut. Uses dynamic paths, safe to re-run.
+> - **Desktop icon** with the Odysseus logo (`scripts/make_icon.py`).
+> - **Launcher with splash** (`Odysseus-launcher.ps1`): loading screen, **no
+>   black console**, waits until the server is ready before opening, opens it in
+>   its **own window** (PWA app mode), and leaves a **system tray icon** to
+>   open/stop it.
 >
-> - **Instalador de un comando** (`install-windows-desktop.ps1`): monta venv,
->   dependencias, cuenta admin, **ChromaDB local** (memoria + RAG sin Docker),
->   **embeddings multilingües** (mejor en español), **Browser MCP** y el acceso
->   directo de escritorio. Usa rutas dinámicas, seguro de re-ejecutar.
-> - **Icono de escritorio** con el logo de Odysseus (`scripts/make_icon.py`).
-> - **Lanzador con splash** (`Odysseus-launcher.ps1`): pantalla de carga, **sin
->   consola negra**, espera a que el servidor esté listo antes de abrir, lo abre
->   en **ventana propia** (modo app PWA) y deja un **icono en la bandeja** para
->   abrir/detener.
->
-> **Instalación:** `powershell -ExecutionPolicy Bypass -File .\install-windows-desktop.ps1`
-> · Guía completa y créditos: **[docs/windows-desktop-setup.md](docs/windows-desktop-setup.md)**
+> **Install:** `powershell -ExecutionPolicy Bypass -File .\install-windows-desktop.ps1`
+> · Full guide and credits: **[docs/windows-desktop-setup.md](docs/windows-desktop-setup.md)**
 
 **One-command launcher** (creates the venv, installs deps, runs setup, starts the
 server; safe to re-run):

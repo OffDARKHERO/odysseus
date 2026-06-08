@@ -1,12 +1,12 @@
 """
-make_icon.py — Genera el icono de escritorio de Odysseus (el barquito).
+make_icon.py - Generates the Odysseus desktop icon (the sailboat).
 
-Crea:
-  - odysseus.ico               (icono multi-tamano para el acceso directo)
-  - odysseus-icon-preview.png  (imagen 256px para el splash del lanzador)
+Creates:
+  - odysseus.ico               (multi-size icon for the desktop shortcut)
+  - odysseus-icon-preview.png  (256px image for the launcher splash)
 
-Uso:
-  python scripts/make_icon.py [directorio_salida]   (por defecto: carpeta del repo)
+Usage:
+  python scripts/make_icon.py [output_dir]   (default: the repo folder)
 """
 import os
 import sys
@@ -14,7 +14,7 @@ import sys
 try:
     from PIL import Image, ImageDraw
 except ImportError:
-    sys.exit("Pillow no esta instalado. Ejecuta: pip install pillow")
+    sys.exit("Pillow is not installed. Run: pip install pillow")
 
 out_dir = sys.argv[1] if len(sys.argv) > 1 else os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -23,23 +23,23 @@ sc = S / 32.0
 img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
 d = ImageDraw.Draw(img)
 
-# fondo oscuro redondeado (combina con el tema oscuro de Odysseus)
+# rounded dark background (matches the Odysseus dark theme)
 d.rounded_rectangle([0, 0, S - 1, S - 1], radius=int(6 * sc), fill=(24, 27, 33, 255))
 
-accent = (224, 108, 117, 255)   # #e06c75 (salmon de marca)
-accent2 = (180, 86, 94, 255)    # tono mas oscuro para la segunda vela
+accent = (224, 108, 117, 255)   # #e06c75 (brand salmon)
+accent2 = (180, 86, 94, 255)    # darker shade for the second sail
 
 
 def P(x, y):
     return (x * sc, y * sc)
 
 
-# velas
+# sails
 d.polygon([P(16, 4), P(16, 22), P(6, 22)], fill=accent)
 d.polygon([P(16, 8), P(16, 22), P(24, 22)], fill=accent2)
 
 
-# ola (dos curvas bezier cuadraticas)
+# wave (two quadratic bezier curves)
 def quad(p0, p1, p2, n=40):
     out = []
     for i in range(n + 1):
